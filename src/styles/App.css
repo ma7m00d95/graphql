@@ -1,0 +1,26 @@
+.App-global {
+  background-color: #0b0e14; /* Switched to your dark theme color */
+  min-height: 100vh; /* Forces it to be at least the height of the screen */
+  width: 100%;
+  display: flex;
+  flex-direction: column; /* Stack login elements vertically */
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.App-global label{
+  color: blue;
+  height: auto;
+  width: auto;
+}
+.App-global input{
+  color: blue;
+  height: auto;
+  width: auto;
+}
+.App-global button{
+  color: blue;
+  height: auto;
+  width: auto;
+}

@@ -1,0 +1,16 @@
+/* 1. Fix the text visibility and layout */
+html, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: #ffffff; /* Changed to white so you can read your text */
+  font-family: Arial, sans-serif;
+}
+/* This removes the "centering" from the body so your div can expand */
+body {
+  margin: 0;
+  display: block !important; 
+  height: 100vh;
+  width: 100vw;
+}
