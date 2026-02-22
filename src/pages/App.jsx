@@ -19,8 +19,8 @@ function App({ onLogin }) {
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
-  const [username, setUser] = useState("malsari")
-  const [password, setPassword] = useState("S@yedM1234")
+  const [username, setUser] = useState("")
+  const [password, setPassword] = useState("")
 
 
   const submit = (e) => {
