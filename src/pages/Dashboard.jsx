@@ -33,17 +33,17 @@ function Dashboard() {
     window.location.href = '/login'; // Redirects and reloads the page
 
   };
- useEffect(() => {
-  const savedDate = localStorage.getItem("savedDate");
+//  useEffect(() => {
+//   const savedDate = localStorage.getItem("savedDate");
 
-  const expired =
-    !savedDate ||
-    Date.now() - new Date(savedDate).getTime() > 60 * 60 * 1000;
+//   const expired =
+//     !savedDate ||
+//     Date.now() - new Date(savedDate).getTime() > 60 * 60 * 1000;
 
-  if (expired) {
-    Logout();
-  }
-}, []);
+//   if (expired) {
+//     Logout();
+//   }
+// }, []);
 
 
   // ---------- Effects (no side effects in render) ----------
