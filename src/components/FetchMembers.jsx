@@ -3,16 +3,30 @@ const GQL_URL = 'https://learn.reboot01.com/api/graphql-engine/v1/graphql';
 
 
 const CAPTAIN_MEMBER = gql`
-query GetGroupsByCaptain($username: String!) {
-  transaction(where: {
-    progress: {
-      group: {
-        captain: { login: { _eq: $username } }
-      }
+query GetGroupsByUser($username: String!) {
+  transaction(
+    where: {
+      _or: [
+        {
+          progress: {
+            group: {
+              captain: { login: { _eq: $username } }
+            }
+          }
+        },
+        {
+          progress: {
+            group: {
+              members: {
+                user: { login: { _eq: $username } }
+              }
+            }
+          }
+        }
+      ]
     }
-  }) {
+  ) {
     progress {
-
       group {
         id
         captain {
@@ -27,7 +41,7 @@ query GetGroupsByCaptain($username: String!) {
           }
         }
       }
-      object{
+      object {
         name
       }
     }
