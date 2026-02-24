@@ -120,7 +120,7 @@ function App({ onLogin }) {
 
             <button
               className="btn btn-neutral btn-block mt-6 text-xl"
-              onClick={submit}
+              onSubmit={submit}
             >
               Login
             </button>
