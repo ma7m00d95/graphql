@@ -100,7 +100,7 @@ function App({ onLogin }) {
             <div>
               <label className="label text-sm font-bold uppercase tracking-wider text-neutral-500">Email</label>
               <input
-                type="email"
+                type="username"
                 className="input input-bordered w-full text-lg bg-base-300 focus:input-primary"
                 placeholder="Enter your email"
                 value={username}
