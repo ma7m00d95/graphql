@@ -73,11 +73,11 @@ export const UserLevelChart = ({ data = [], userLevel }) => {
         Levels
       </h2>
 
-      <div className="w-full aspect-square flex justify-center items-center">
-        <svg viewBox={`0 0 ${width} ${height}`} className="overflow-visible w-full h-full">
+      <div className="w-md aspect-square flex justify-center items-center">
+        <svg viewBox={`0 0 ${width} ${height}`} className="overflow-visible w-md h-fit">
           {/* Axis Labels */}
-          <text x={width / 2} y={height - 10} textAnchor="middle" fontSize="12" fill="#666">Level</text>
-          <text x={15} y={height / 2} textAnchor="middle" fontSize="12" fill="#666" transform={`rotate(-90, 15, ${height / 2})`}>Users</text>
+          <text x={width / 2} y={height - 10} textAnchor="middle" fontSize="12" fill="#ffd79a">Level</text>
+          <text x={15} y={height / 2} textAnchor="middle" fontSize="12" fill="#ffd79a" transform={`rotate(-90, 15, ${height / 2})`}>Users</text>
 
           {data.map((item, i) => {
             const barHeight = (item.count / maxValue) * (height - padding * 2);
@@ -94,9 +94,9 @@ export const UserLevelChart = ({ data = [], userLevel }) => {
                     x={x + (barWidth * 0.45)}
                     y={y - 25}
                     textAnchor="middle"
-                    fontSize="10"
+                    fontSize="12"
                     fontWeight="bold"
-                    fill="#f87272"
+                    fill="#ff5700"
                   >
                     YOU
                   </text>
@@ -107,12 +107,12 @@ export const UserLevelChart = ({ data = [], userLevel }) => {
                   y={y}
                   width={barWidth * 0.8}
                   height={barHeight}
-                  fill={isMyLevel ? "#f87272" : "#38bdf8"}
+                  fill={isMyLevel ? "#ff5700" : "#85b404"}
                   rx="3"
                 />
 
-                <text x={x + (barWidth * 0.4)} y={height - 40} textAnchor="middle" fontSize="9">{item.level}</text>
-                <text x={x + (barWidth * 0.4)} y={y - 5} textAnchor="middle" fontSize="10" fontWeight="bold">{item.count}</text>
+                <text fill='#ffd79a' x={x + (barWidth * 0.4)} y={height - 40} textAnchor="middle" fontSize="9">{item.level}</text>
+                <text fill='#ffd79a' x={x + (barWidth * 0.4)} y={y - 5} textAnchor="middle" fontSize="10" fontWeight="bold">{item.count}</text>
               </g>
             );
           })}

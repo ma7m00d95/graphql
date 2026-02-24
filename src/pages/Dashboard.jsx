@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FetchData, fetchAuditRatio, RatioComponent } from '../services/FetchGrades.jsx';
+import { FetchData, fetchAuditRatio, GradeComponent } from '../components/FetchGrades.jsx';
+import { RatioComponent } from '../components/FetchRatio.jsx';
 import { FetchUser } from '../services/FetchUserDetails.js';
-import { FetchMembers, MembersComponent } from '../services/FetchMembers.jsx';
-import { FetchUsersByCohort, UserLevelChart } from '../services/FetchUsersByCohort.jsx';
+import { FetchMembers, MembersComponent } from '../components/FetchMembers.jsx';
+import { FetchUsersByCohort, UserLevelChart } from '../components/FetchUsersByCohort.jsx';
 import { fetchSkills, SkillsRadarChart } from '../components/Skill.jsx';
+import { FetchMyCohort } from '../services/FetchCohort.js';
 
 import '../styles/Dashboard.css';
 
@@ -60,7 +62,9 @@ function Dashboard() {
   useEffect(() => {
     async function loadCohort() {
       try {
-        const response = await FetchUsersByCohort(763);
+        const cohort = await FetchMyCohort();
+
+        const response = await FetchUsersByCohort(cohort);
         const eventUsers = response.event_user || [];
 
         const myUsername = typeof window !== 'undefined' ? localStorage.getItem('username') : null;
@@ -137,6 +141,11 @@ function Dashboard() {
     loadAudit();
   }, []);
 
+  const Logout = () => {
+    localStorage.clear('token');
+    window.location.href = '/login'; // Redirects and reloads the page
+
+  };
 
 
   const recentCountCalc = useMemo(() => {
@@ -166,56 +175,76 @@ function Dashboard() {
 
 
   return (
-    <div data-theme="retro" className="dashboard">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-primary">
-          Welcome back, <span className="text-primary-focus">{userInfo?.attrs?.firstName}</span> 👋
-        </h1>
-        <p className="opacity-70 text-sm">
-          Hope you're having a productive day!
-        </p>
-      </div>
+    <div data-theme="abyss" className="min-h-screen bg-base-300">
+      {/* 1. Added a wrapper with container, mx-auto, and responsive padding */}
+      <div className="container mx-auto max-w-7xl px-4 md:px-10 py-8">
 
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Cohort levels */}
-        <div className="card bg-base-100 shadow-xl border border-base-content/10 md:col-span-1">
-          {chartData.length > 0 && (
-            <UserLevelChart data={chartData} userLevel={myCohortLevel} />
-          )}
+        {/* Top Header Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-primary">
+              Welcome back, <span className="text-primary-focus">{userInfo?.attrs?.firstName}</span> 👋
+            </h1>
+            <p className="opacity-70 text-sm">
+              Hope you're having a productive day!
+            </p>
+          </div>
+          <div className="md:text-right">
+            <button className="btn btn-primary btn-wide" type='button' onClick={Logout}>Logout</button>
+          </div>
         </div>
 
-        {/* Skills */}
-        <div className="card bg-base-100 shadow-xl border border-base-content/10 md:col-span-1">
-          {Array.isArray(skillsInfo) && skillsInfo.length > 0 ? (
-            <SkillsRadarChart skills={skillsInfo} />
-          ) : (
-            <p className="text-center opacity-50 italic">No skills loaded yet.</p>
-          )}
-        </div>
+        {/* Charts & Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Ratio */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
 
-        {/* Members */}
-        <div className="card bg-base-100 shadow-xl border border-base-content/10 md:col-span-1 h-[520px]">
-          {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
-            <MembersComponent members={membersInfo} />
-          ) : (
-            <p className="text-center opacity-50 italic">No members loaded yet.</p>
-          )}
-        </div>
+            {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
+              <RatioComponent ratio={projectsInfo} audit={audit} recentCount={recentCount} />
+            ) : (
+              <p className="p-10 text-center opacity-50 italic">No members loaded yet.</p>
+            )}
+          </div>
+          {/* Cohort levels */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
+            {chartData.length > 0 && (
+              <UserLevelChart data={chartData} userLevel={myCohortLevel} />
+            )}
+          </div>
 
-        {/* Projects & Grades (actually XP-based projects list) */}
-        <div className="card bg-base-100 shadow-xl border border-base-content/10 md:col-span-1">
-          {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
-            <RatioComponent ratio={projectsInfo}
-              audit={audit}
-              recentCount={recentCount} />
-          ) : (
-            <p className="text-center opacity-50 italic">No members loaded yet.</p>
-          )}
+          {/* Skills Radar */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
+            {Array.isArray(skillsInfo) && skillsInfo.length > 0 ? (
+              <SkillsRadarChart skills={skillsInfo} />
+            ) : (
+              <p className="p-10 text-center opacity-50 italic">No skills loaded yet.</p>
+            )}
+          </div>
+
+          {/* Members */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
+            {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
+              <MembersComponent members={membersInfo} />
+            ) : (
+              <p className="p-10 text-center opacity-50 italic">No members loaded yet.</p>
+            )}
+          </div>
+
+          {/* Projects */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
+            {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
+              <GradeComponent ratio={projectsInfo} audit={audit} recentCount={recentCount} />
+            ) : (
+              <p className="p-10 text-center opacity-50 italic">No members loaded yet.</p>
+            )}
+
+          </div>
+
         </div>
       </div>
     </div>
   );
+
 }
 
 export default Dashboard;

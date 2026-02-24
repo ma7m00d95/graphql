@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import '../styles/App.css'
 import { request, gql } from 'graphql-request';
-
+import bgImage from '../assets/bg.png'
 const API_URL_LOGIN = `https://learn.reboot01.com/api/auth/signin`
 const API_URL = 'https://learn.reboot01.com/api/graphql-engine/v1/graphql';
 
@@ -77,20 +77,56 @@ function App({ onLogin }) {
 
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-        {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <legend className="fieldset-legend text-3xl font-bold ">Login</legend>
+    <div className="flex h-screen w-full bg-base-100">
+      {/* Left Side: Image Container */}
+      <div className="hidden w-1/2 lg:block">
+        <img
+          src={bgImage}
+          alt="Company Logo"
+          className="h-full w-full object-cover"
+        />
+      </div>
 
-        <label className="text-3xl font-bold text-neutral">Email</label>
-        <input type="email" className="input text-2xl  bg-base-300" placeholder="Email" value={username} onChange={(e) => { setUser(e.target.value) }} />
+      {/* Right Side: Form Container */}
+      <div className="flex w-full flex-col items-center justify-center p-8 lg:w-1/2">
+        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full max-w-sm border p-8 shadow-2xl">
+          {error && <p className="mb-4 text-center text-error font-medium">{error}</p>}
 
-        <label className="text-3xl font-bold text-neutral">Password</label>
-        <input type="password" className="input text-2xl  bg-base-300" placeholder="Password" value={password} onChange={(e) => { setPassword(e.target.value) }} />
+          <legend className="fieldset-legend mb-6 text-4xl font-black tracking-tight">Login</legend>
 
-        <button className="btn btn-neutral mt-4 text-2xl" onClick={submit}>Login</button>
-      </fieldset>
+          <div className="space-y-4">
+            <div>
+              <label className="label text-sm font-bold uppercase tracking-wider text-neutral-500">Email</label>
+              <input
+                type="email"
+                className="input input-bordered w-full text-lg bg-base-300 focus:input-primary"
+                placeholder="Enter your email"
+                value={username}
+                onChange={(e) => { setUser(e.target.value) }}
+              />
+            </div>
+
+            <div>
+              <label className="label text-sm font-bold uppercase tracking-wider text-neutral-500">Password</label>
+              <input
+                type="password"
+                className="input input-bordered w-full text-lg bg-base-300 focus:input-primary"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value) }}
+              />
+            </div>
+
+            <button
+              className="btn btn-neutral btn-block mt-6 text-xl"
+              onClick={submit}
+            >
+              Login
+            </button>
+          </div>
+        </fieldset>
+      </div>
     </div>
 
   )
