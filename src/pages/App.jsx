@@ -90,7 +90,7 @@ function App({ onLogin }) {
 
       {/* Right Side: Form Container */}
       <div className="flex w-full flex-col items-center justify-center p-8 lg:w-1/2">
-        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full max-w-sm border p-8 shadow-2xl">
+        <form className="fieldset bg-base-200 border-base-300 rounded-box w-full max-w-sm border p-8 shadow-2xl">
           {error && <p className="mb-4 text-center text-error font-medium">{error}</p>}
 
           <legend className="fieldset-legend mb-6 text-4xl font-black tracking-tight">Login</legend>
@@ -125,7 +125,7 @@ function App({ onLogin }) {
               Login
             </button>
           </div>
-        </fieldset>
+        </form>
       </div>
     </div>
 
