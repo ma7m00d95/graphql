@@ -61,8 +61,8 @@ export const FetchUsersByCohort = async (cohort) => {
 export const UserLevelChart = ({ data = [], userLevel }) => {
   if (data.length === 0) return null;
 
-  const width = 600;
-  const height = 350;
+const width = 600;
+const height = 400;
   const padding = 60; // Increased padding for labels
   const maxValue = Math.max(...data.map(d => d.count)) || 1;
   const barWidth = (width - padding * 2) / data.length;
@@ -73,8 +73,12 @@ export const UserLevelChart = ({ data = [], userLevel }) => {
         Levels
       </h2>
 
-      <div className="w-md aspect-square flex justify-center items-center">
-        <svg viewBox={`0 0 ${width} ${height}`} className="overflow-visible w-md h-fit">
+<div className="w-full h-full flex justify-center items-center">
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    className="w-full h-full"
+    preserveAspectRatio="xMidYMid meet"
+  >
           {/* Axis Labels */}
           <text x={width / 2} y={height - 10} textAnchor="middle" fontSize="12" fill="#ffd79a">Level</text>
           <text x={15} y={height / 2} textAnchor="middle" fontSize="12" fill="#ffd79a" transform={`rotate(-90, 15, ${height / 2})`}>Users</text>

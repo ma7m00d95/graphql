@@ -33,8 +33,9 @@ export const fetchSkills = async () => {
 export const SkillsRadarChart = ({ skills = [] }) => {
   if (skills.length === 0) return null;
 
-  const size = 450;
-  const center = size / 2;
+const size = 300; // logical drawing size
+const center = size / 2;
+
   const maxRadius = size * 0.25;
   const minRadius = 10; // Prevents points from bunching at the 0 center
   const totalAxes = skills.length;
@@ -70,8 +71,12 @@ export const SkillsRadarChart = ({ skills = [] }) => {
         Skills Map
       </h2>
 
-      <div className="w-md aspect-square flex justify-center items-center">
-        <svg viewBox={`0 0 ${size} ${size}`} className="overflow-visible w-md h-md">
+<div className="w-full max-w-md aspect-square flex justify-center items-center">
+  <svg
+    viewBox={`0 0 ${size} ${size}`}
+    className="w-full h-full"
+  >
+
           {/* 1. Grid Rings */}
           {[0.2, 0.4, 0.6, 0.8, 1].map((r) => (
             <circle

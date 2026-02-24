@@ -81,7 +81,7 @@ export const MembersComponent = ({ members = [] }) => {
       </h2>
 
       {/* Scrollable table area */}
-      <div className="border border-base-300 rounded-box flex-1 min-h-0 max-h-100 overflow-hidden">
+      <div className="border border-base-300 rounded-box flex-1 min-h-0 max-h-70 overflow-hidden">
         <div className="h-full flex flex-col min-h-0 ">
           {/* Sticky header */}
           <div className="overflow-x-auto">

@@ -65,6 +65,8 @@ function App({ onLogin }) {
 
           // 3. Store the ID
           localStorage.setItem('userId', userId);
+          const now = new Date().toISOString();
+localStorage.setItem("savedDate", now);
           navigate('/dashboard');
         }
       })

@@ -10,6 +10,7 @@ import { FetchMyCohort } from '../services/FetchCohort.js';
 import '../styles/Dashboard.css';
 
 function Dashboard() {
+  
   const [userInfo, setUserInfo] = useState(null);
   const [projectsInfo, setProjectsInfo] = useState([]);
   const [recentCount, setRecentCount] = useState(0);
@@ -22,6 +23,28 @@ function Dashboard() {
 
   // New: audit stats
   const [audit, setAudit] = useState({ auditRatio: 0, totalUp: 0, totalDown: 0 });
+
+    const Logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('savedDate');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+
+    window.location.href = '/login'; // Redirects and reloads the page
+
+  };
+ useEffect(() => {
+  const savedDate = localStorage.getItem("savedDate");
+
+  const expired =
+    !savedDate ||
+    Date.now() - new Date(savedDate).getTime() > 60 * 60 * 1000;
+
+  if (expired) {
+    Logout();
+  }
+}, []);
+
 
   // ---------- Effects (no side effects in render) ----------
   useEffect(() => {
@@ -91,6 +114,7 @@ function Dashboard() {
     async function loadMembers() {
       try {
         const data = await FetchMembers();
+
         const uniqueList =
           data?.transaction?.reduce((acc, current) => {
             const groupId = current.progress?.group?.id;
@@ -141,11 +165,7 @@ function Dashboard() {
     loadAudit();
   }, []);
 
-  const Logout = () => {
-    localStorage.clear('token');
-    window.location.href = '/login'; // Redirects and reloads the page
 
-  };
 
 
   const recentCountCalc = useMemo(() => {
@@ -195,52 +215,75 @@ function Dashboard() {
         </div>
 
         {/* Charts & Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Ratio */}
-          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
+{/* ===== Ratio Row (3 cards) ===== */}
+{Array.isArray(membersInfo) && membersInfo.length > 0 && (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <RatioComponent
+      ratio={projectsInfo}
+      audit={audit}
+      recentCount={recentCount}
+    />
+  </div>
+)}
 
-            {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
-              <RatioComponent ratio={projectsInfo} audit={audit} recentCount={recentCount} />
-            ) : (
-              <p className="p-10 text-center opacity-50 italic">No members loaded yet.</p>
-            )}
-          </div>
-          {/* Cohort levels */}
-          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
-            {chartData.length > 0 && (
-              <UserLevelChart data={chartData} userLevel={myCohortLevel} />
-            )}
-          </div>
+{/* ===== Rest of Dashboard (2 cards per row) ===== */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          {/* Skills Radar */}
-          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
-            {Array.isArray(skillsInfo) && skillsInfo.length > 0 ? (
-              <SkillsRadarChart skills={skillsInfo} />
-            ) : (
-              <p className="p-10 text-center opacity-50 italic">No skills loaded yet.</p>
-            )}
-          </div>
+  {/* Cohort levels */}
+<div className="card bg-base-100 shadow-xl border border-base-content/10">
+  <div className="card-body h-[400px] md:h-[550px]">
+    {chartData.length > 0 && (
+      <UserLevelChart data={chartData} userLevel={myCohortLevel} />
+    )}
+  </div>
+</div>
 
-          {/* Members */}
-          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
-            {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
-              <MembersComponent members={membersInfo} />
-            ) : (
-              <p className="p-10 text-center opacity-50 italic">No members loaded yet.</p>
-            )}
-          </div>
 
-          {/* Projects */}
-          <div className="card bg-base-100 shadow-xl border border-base-content/10 overflow-hidden">
-            {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
-              <GradeComponent ratio={projectsInfo} audit={audit} recentCount={recentCount} />
-            ) : (
-              <p className="p-10 text-center opacity-50 italic">No members loaded yet.</p>
-            )}
+  {/* Skills Radar */}
+<div className="card bg-base-100 shadow-xl border border-base-content/10">
+  <div className="card-body h-[400px] md:h-[550px]">
+    {Array.isArray(skillsInfo) && skillsInfo.length > 0 ? (
+      <SkillsRadarChart skills={skillsInfo} />
+    ) : (
+      <p className="p-10 text-center opacity-50 italic">
+        No skills loaded yet.
+      </p>
+    )}
+  </div>
+  </div>
 
-          </div>
+  {/* Members */}
+<div className="card bg-base-100 shadow-xl border border-base-content/10">
+  <div className="card-body h-[400px] md:h-[450px]">    
+    {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
+      <MembersComponent members={membersInfo} />
+    ) : (
+      <p className="p-10 text-center opacity-50 italic">
+        No members loaded yet.
+      </p>
+    )}
+    </div>
+  </div>
 
-        </div>
+  {/* Projects */}
+<div className="card bg-base-100 shadow-xl border border-base-content/10">
+  <div className="card-body h-[400px] md:h-[450px]">    
+    {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
+      <GradeComponent
+        ratio={projectsInfo}
+        audit={audit}
+        recentCount={recentCount}
+      />
+    ) : (
+      <p className="p-10 text-center opacity-50 italic">
+        No members loaded yet.
+      </p>
+    )}
+    </div>
+  </div>
+
+</div>
+
       </div>
     </div>
   );

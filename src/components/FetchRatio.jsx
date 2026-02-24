@@ -96,79 +96,79 @@ export const RatioComponent = ({
     return seen.size;
   }, [ratio]);
 
-
-  return (
-    <div className="card-body p-4 items-center ">
-      {/* >>> NEW: Replace the two circles with useful stats <<< */}
-      {/* Stats row — responsive */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
-
-        {/* Total Projects */}
-        <div className="stats shadow border border-base-content/10 h-full min-w-0 order-1">
-          <div className="stat">
-            <div className="stat-title text-primary font-bold">Total Projects</div>
-            <div className="stat-value text-primary">{totalFinished}</div>
-            <div className="stat-desc font-medium">
-              <span className="text-amber-700 font-bold">{recentCount}</span> projects in the last <span className="text-amber-700 font-bold">90</span> days
-            </div>
-          </div>
+return (
+  <>
+    {/* Total Projects */}
+    <div className="card bg-base-100 shadow-xl border border-base-content/10">
+      <div className="card-body">
+        <div className="stat-title text-primary font-bold">
+          Total Projects
         </div>
-
-        {/* Audit Ratio */}
-        <div className="stats shadow border border-base-content/10 h-full min-w-0 order-2">
-          <div className="stat">
-            <div className="stat-title text-primary font-bold">Audit Ratio</div>
-            <div className="stat-value text-primary">{audit.auditRatio.toFixed(2)}</div>
-            <div className="stat-desc">Higher is better</div>
-          </div>
+        <div className="stat-value text-primary">
+          {totalFinished}
         </div>
-
-        {/* Audits card — full width under the first two on md; goes back to one column on xl */}
-        <div
-          className="
-      card bg-base-100 shadow border border-base-content/10 h-full min-w-0
-      md:col-span-2 xl:col-span-1
-      md:order-last
-    "
-        >
-          <div className="card-body">
-
-            {/* Audits Done */}
-            <div className="flex items-baseline justify-between">
-              <span className="text-primary font-bold">Audits Done</span>
-              <span className="font-mono">
-                {formatCombinedMiB(audit.totalUp, audit.totalUpExtra)} MB <span className="opacity-70">↑</span>
-              </span>
-            </div>
-
-            {(() => {
-              // Use actual MiB for bars (not percent)
-              const toMiB = (bytes) => Math.round((bytes / (1000 * 1000)) * 100) / 100;
-              const upMiB = toMiB((audit.totalUp || 0) + (audit.totalUpExtra || 0));
-              const downMiB = toMiB(audit.totalDown || 0);
-              const totalMiB = upMiB + downMiB;
-              const max = totalMiB > 0 ? totalMiB : 1;
-
-              return (
-                <>
-                  <progress className="progress progress-primary w-full" value={totalMiB > 0 ? upMiB : 0} max={max} />
-
-                  {/* Audits Received */}
-                  <div className="flex items-baseline justify-between mt-3">
-                    <span className="text-success font-bold">Audits Received</span>
-                    <span className="font-mono">
-                      {toMiB(audit.totalDown).toFixed(2)} MB <span className="opacity-70">↓</span>
-                    </span>
-                  </div>
-                  <progress className="progress progress-success w-full" value={totalMiB > 0 ? downMiB : 0} max={max} />
-                </>
-              );
-            })()}
-          </div>
+        <div className="stat-desc font-medium">
+          <span className="text-amber-700 font-bold">
+            {recentCount}
+          </span>{" "}
+          projects in the last{" "}
+          <span className="text-amber-700 font-bold">90</span> days
         </div>
       </div>
     </div>
 
+    {/* Audit Ratio */}
+    <div className="card bg-base-100 shadow-xl border border-base-content/10">
+      <div className="card-body">
+        <div className="stat-title text-primary font-bold">
+          Audit Ratio
+        </div>
+        <div className="stat-value text-primary">
+          {audit.auditRatio?.toFixed(2)}
+        </div>
+        <div className="stat-desc">Higher is better</div>
+      </div>
+    </div>
 
-  )
+    {/* Audits */}
+    <div className="card bg-base-100 shadow-xl border border-base-content/10">
+      <div className="card-body">
+        <div className="flex items-baseline justify-between">
+          <span className="text-primary font-bold">
+            Audits Done
+          </span>
+          <span className="font-mono">
+            {formatCombinedMiB(
+              audit.totalUp,
+              audit.totalUpExtra
+            )}{" "}
+            MB ↑
+          </span>
+        </div>
+
+        <progress
+          className="progress progress-primary w-full"
+          value={audit.totalUp || 0}
+          max={(audit.totalUp || 0) + (audit.totalDown || 0) || 1}
+        />
+
+        <div className="flex items-baseline justify-between mt-3">
+          <span className="text-success font-bold">
+            Audits Received
+          </span>
+          <span className="font-mono">
+            {toMiB(audit.totalDown || 0).toFixed(2)} MB ↓
+          </span>
+        </div>
+
+        <progress
+          className="progress progress-success w-full"
+          value={audit.totalDown || 0}
+          max={(audit.totalUp || 0) + (audit.totalDown || 0) || 1}
+        />
+      </div>
+    </div>
+  </>
+);
+
 }
