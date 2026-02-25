@@ -6,16 +6,19 @@ import { FetchMembers, MembersComponent } from '../components/FetchMembers.jsx';
 import { FetchUsersByCohort, UserLevelChart } from '../components/FetchUsersByCohort.jsx';
 import { fetchSkills, SkillsRadarChart } from '../components/Skill.jsx';
 import { FetchMyCohort } from '../services/FetchCohort.js';
+import { useNavigate } from "react-router-dom";
 
 import '../styles/Dashboard.css';
 
 function Dashboard() {
-  
+
   const [userInfo, setUserInfo] = useState(null);
+
   const [projectsInfo, setProjectsInfo] = useState([]);
   const [recentCount, setRecentCount] = useState(0);
 
   const [membersInfo, setMembersInfo] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   const [chartData, setChartData] = useState([]);
   const [myCohortLevel, setMyCohortLevel] = useState(null);
@@ -24,27 +27,13 @@ function Dashboard() {
   // New: audit stats
   const [audit, setAudit] = useState({ auditRatio: 0, totalUp: 0, totalDown: 0 });
 
-    const Logout = () => {
+  const Logout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('savedDate');
     localStorage.removeItem('userId');
-    localStorage.removeItem('username');
 
     window.location.href = '/login'; // Redirects and reloads the page
 
   };
-//  useEffect(() => {
-//   const savedDate = localStorage.getItem("savedDate");
-
-//   const expired =
-//     !savedDate ||
-//     Date.now() - new Date(savedDate).getTime() > 60 * 60 * 1000;
-
-//   if (expired) {
-//     Logout();
-//   }
-// }, []);
-
 
   // ---------- Effects (no side effects in render) ----------
   useEffect(() => {
@@ -90,8 +79,8 @@ function Dashboard() {
         const response = await FetchUsersByCohort(cohort);
         const eventUsers = response.event_user || [];
 
-        const myUsername = typeof window !== 'undefined' ? localStorage.getItem('username') : null;
-        const myEntry = eventUsers.find((u) => u.userLogin === myUsername);
+        const myUserId = Number(localStorage.getItem('userId'));
+        const myEntry = eventUsers.find((u) => u.userId === myUserId);
         setMyCohortLevel(myEntry ? myEntry.level : null);
 
         const counts = eventUsers.reduce((acc, curr) => {
@@ -111,9 +100,15 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
+    const id = localStorage.getItem('userId');
+    if (id) setUserId(Number(id));
+  }, []);
+  useEffect(() => {
+    if (!userId) return;
+
     async function loadMembers() {
       try {
-        const data = await FetchMembers();
+        const data = await FetchMembers(userId);
 
         const uniqueList =
           data?.transaction?.reduce((acc, current) => {
@@ -130,8 +125,10 @@ function Dashboard() {
         setMembersInfo([]);
       }
     }
+
     loadMembers();
-  }, []);
+  }, [userId]);
+
 
   useEffect(() => {
     async function loadSkills() {
@@ -215,74 +212,74 @@ function Dashboard() {
         </div>
 
         {/* Charts & Content Grid */}
-{/* ===== Ratio Row (3 cards) ===== */}
-{Array.isArray(membersInfo) && membersInfo.length > 0 && (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    <RatioComponent
-      ratio={projectsInfo}
-      audit={audit}
-      recentCount={recentCount}
-    />
-  </div>
-)}
+        {/* ===== Ratio Row (3 cards) ===== */}
+        {Array.isArray(membersInfo) && membersInfo.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <RatioComponent
+              ratio={projectsInfo}
+              audit={audit}
+              recentCount={recentCount}
+            />
+          </div>
+        )}
 
-{/* ===== Rest of Dashboard (2 cards per row) ===== */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* ===== Rest of Dashboard (2 cards per row) ===== */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-  {/* Cohort levels */}
-<div className="card bg-base-100 shadow-xl border border-base-content/10">
-  <div className="card-body h-[400px] md:h-[550px]">
-    {chartData.length > 0 && (
-      <UserLevelChart data={chartData} userLevel={myCohortLevel} />
-    )}
-  </div>
-</div>
+          {/* Cohort levels */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10">
+            <div className="card-body h-[400px] md:h-[550px]">
+              {chartData.length > 0 && (
+                <UserLevelChart data={chartData} userLevel={myCohortLevel} />
+              )}
+            </div>
+          </div>
 
 
-  {/* Skills Radar */}
-<div className="card bg-base-100 shadow-xl border border-base-content/10">
-  <div className="card-body h-[400px] md:h-[550px]">
-    {Array.isArray(skillsInfo) && skillsInfo.length > 0 ? (
-      <SkillsRadarChart skills={skillsInfo} />
-    ) : (
-      <p className="p-10 text-center opacity-50 italic">
-        No skills loaded yet.
-      </p>
-    )}
-  </div>
-  </div>
+          {/* Skills Radar */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10">
+            <div className="card-body h-[400px] md:h-[550px]">
+              {Array.isArray(skillsInfo) && skillsInfo.length > 0 ? (
+                <SkillsRadarChart skills={skillsInfo} />
+              ) : (
+                <p className="p-10 text-center opacity-50 italic">
+                  No skills loaded yet.
+                </p>
+              )}
+            </div>
+          </div>
 
-  {/* Members */}
-<div className="card bg-base-100 shadow-xl border border-base-content/10">
-  <div className="card-body h-[400px] md:h-[450px]">    
-    {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
-      <MembersComponent members={membersInfo} />
-    ) : (
-      <p className="p-10 text-center opacity-50 italic">
-        No members loaded yet.
-      </p>
-    )}
-    </div>
-  </div>
+          {/* Members */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10">
+            <div className="card-body h-[400px] md:h-[450px]">
+              {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
+                <MembersComponent members={membersInfo} />
+              ) : (
+                <p className="p-10 text-center opacity-50 italic">
+                  No members loaded yet.
+                </p>
+              )}
+            </div>
+          </div>
 
-  {/* Projects */}
-<div className="card bg-base-100 shadow-xl border border-base-content/10">
-  <div className="card-body h-[400px] md:h-[450px]">    
-    {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
-      <GradeComponent
-        ratio={projectsInfo}
-        audit={audit}
-        recentCount={recentCount}
-      />
-    ) : (
-      <p className="p-10 text-center opacity-50 italic">
-        No members loaded yet.
-      </p>
-    )}
-    </div>
-  </div>
+          {/* Projects */}
+          <div className="card bg-base-100 shadow-xl border border-base-content/10">
+            <div className="card-body h-[400px] md:h-[450px]">
+              {Array.isArray(membersInfo) && membersInfo.length > 0 ? (
+                <GradeComponent
+                  ratio={projectsInfo}
+                  audit={audit}
+                  recentCount={recentCount}
+                />
+              ) : (
+                <p className="p-10 text-center opacity-50 italic">
+                  No members loaded yet.
+                </p>
+              )}
+            </div>
+          </div>
 
-</div>
+        </div>
 
       </div>
     </div>

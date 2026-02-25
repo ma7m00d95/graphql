@@ -1,16 +1,15 @@
 import { request, gql } from 'graphql-request';
 const GQL_URL = 'https://learn.reboot01.com/api/graphql-engine/v1/graphql';
 
-
 const CAPTAIN_MEMBER = gql`
-query GetGroupsByUser($username: String!) {
+query GetGroupsByUser($userId: Int!) {
   transaction(
     where: {
       _or: [
         {
           progress: {
             group: {
-              captain: { login: { _eq: $username } }
+              captain: { id: { _eq: $userId } }
             }
           }
         },
@@ -18,7 +17,7 @@ query GetGroupsByUser($username: String!) {
           progress: {
             group: {
               members: {
-                user: { login: { _eq: $username } }
+                user: { id: { _eq: $userId } }
               }
             }
           }
@@ -30,11 +29,13 @@ query GetGroupsByUser($username: String!) {
       group {
         id
         captain {
+          id
           login
           firstName
         }
         members {
           user {
+            id
             login
             firstName
             lastName
@@ -49,26 +50,22 @@ query GetGroupsByUser($username: String!) {
 }
 `
 
-export const FetchMembers = async () => {
-  const username = localStorage.getItem('username');
-
+export const FetchMembers = async (userId) => {
   const token = localStorage.getItem('token');
 
-  if (!token) throw new Error('Missing auth token');
-  const variables = {
-    username,
-  };
-  console.log("Fetch Members")
+  if (!token || !userId) {
+    console.log("Waiting for userId...");
+    return { transaction: [] }; // prevent crash
+  }
 
-  return request(
+   return request(
     GQL_URL,
     CAPTAIN_MEMBER,
-    variables,
+    { userId },
     { Authorization: `Bearer ${token}` }
   );
+};
 
-
-}
 
 
 export const MembersComponent = ({ members = [] }) => {

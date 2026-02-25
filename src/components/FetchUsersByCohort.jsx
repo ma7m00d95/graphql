@@ -8,7 +8,7 @@ const GQL_URL = 'https://learn.reboot01.com/api/graphql-engine/v1/graphql';
 // const co5 = 1195
 
 const GET_COHORT_Users = gql`
-query GetAllMemberLevels($cohort: Int!)  {
+query GetAllMemberLevels($cohort: Int!) {
   event_user(
     where: { 
       eventId: { _eq: $cohort }, 
@@ -17,30 +17,19 @@ query GetAllMemberLevels($cohort: Int!)  {
     order_by: { level: desc }
   ) {
     level
+    userId        # <-- Add this!
     userLogin
-    # Adding the user relationship to get names
-    publicUser{
+    publicUser {
       firstName
       lastName
     }
   }
 }
 `;
-const GET_COHORT = `query GetCohortEventIds {
-  event(
-    where: { 
-      # This removes all the [] results from your list
-      cohorts: { id: { _is_null: false } } 
-    }
-  ) {
-    id
-    path
-    cohorts {
-      name
-    }
-  }
-}`;
+
+
 export const FetchUsersByCohort = async (cohort) => {
+
   const token = localStorage.getItem('token');
 
   if (!token) throw new Error('Missing auth token');

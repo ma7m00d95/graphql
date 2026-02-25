@@ -6,14 +6,6 @@ import bgImage from '../assets/bg.png'
 const API_URL_LOGIN = `https://learn.reboot01.com/api/auth/signin`
 const API_URL = 'https://learn.reboot01.com/api/graphql-engine/v1/graphql';
 
-// Define the Login Mutation
-const LOGIN_MUTATION = gql`
-  mutation Login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-      token
-    }
-  }
-`;
 
 function App({ onLogin }) {
   const navigate = useNavigate();
@@ -23,59 +15,58 @@ function App({ onLogin }) {
   const [password, setPassword] = useState("")
 
 
-  const submit = (e) => {
-    e.preventDefault();
-    setError('');
+const submit = async (e) => {
+  e.preventDefault();
+  setError('');
 
+  try {
     const credentials = btoa(`${username}:${password}`);
 
-    fetch('https://learn.reboot01.com/api/auth/signin', {
+    // 1. Login
+    const loginRes = await fetch(API_URL_LOGIN, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('Login failed');
-        return response.json();
-      })
-      .then(token => {
-        onLogin(token);
+        Authorization: `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-        // 1. Save the token
-        localStorage.setItem('username', username);
+    if (!loginRes.ok) throw new Error('Login failed');
 
-        // 2. Immediately fetch the User ID using the new token
-        return fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `query { user { id login } }`
-          })
-        });
-      })
-      .then(res => res.json())
-      .then(result => {
-        if (result.data && result.data.user.length > 0) {
-          const userId = result.data.user[0].id;
+    const token = await loginRes.json();
 
-          // 3. Store the ID
-          localStorage.setItem('userId', userId);
-          const now = new Date().toISOString();
-localStorage.setItem("savedDate", now);
-          navigate('/dashboard');
-        }
-      })
-      .catch(err => {
-        setError('Invalid username or password');
-        console.error(err);
-      });
+    // Save token immediately
+    localStorage.setItem('token', token);
+ 
+    // 2. Fetch user ID
+    const userRes = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `query { user { id login } }`,
+      }),
+    });
 
-  };
+    const result = await userRes.json();
+
+    if (result.data?.user?.length > 0) {
+      const userId = result.data.user[0].id;
+
+      localStorage.setItem('userId', userId);
+
+      navigate('/dashboard');
+    }
+    onLogin(token); // 🔥 IMPORTANT
+
+
+  } catch (err) {
+    setError('Invalid username or password');
+    console.error(err);
+  }
+};
 
 
   return (
